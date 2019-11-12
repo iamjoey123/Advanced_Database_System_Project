@@ -1,9 +1,15 @@
-#include<stdc++.h>
+ 
+#include<bits/stdc++.h>
+#include <string>
+#include <map>
+
 using namespace std;
+
 int min(int x, int y, int z)
 {
 	return min(min(x, y), z);
 }
+
 int editDist(string str1, string str2, int m, int n)
 {
 	// If first string is empty, the only option is to 
@@ -30,14 +36,52 @@ int editDist(string str1, string str2, int m, int n)
 	);
 }
 
+multimap<int,string> subString(string str, string query, int n, int k)  
+{ 
+    multimap <int, string> tempmap;
+    string temp = "";
+    // Pick starting point 
+    for (int len = 1; len <= n; len++)  
+    {     
+        // Pick ending point 
+        for (int i = 0; i <= n - len; i++)  
+        { 
+            //  Print characters from current 
+            // starting point to current ending 
+            // point.   
+            int j = i + len - 1;             
+            for (int k = i; k <= j; k++)  
+                temp += str[k]; 
+	    if(tempmap.size() < k)
+		tempmap.insert(pair<int, string>(editDist(temp, query, temp.length(), query.length()), temp));
+	    else
+	    {
+		int dist = editDist(temp, query, temp.length(), query.length());
+		auto itr = --tempmap.end();
+		if(itr->first > dist)
+		{
+			tempmap.erase(itr);
+			tempmap.insert(pair<int, string>(dist, temp));
+		}
+	    }	
+	    temp = "";
+        } 
+    } 
+
+    return tempmap;
+} 
 
 int main()
 {
 	// your code goes here 
-	string str1 = "sunday";
+	string str1 = "saturdab";
 	string str2 = "saturday";
+	int k = 3;
+	multimap<int, string> substrings = subString(str1, str2, str1.length(), k);
+	for(auto i = substrings.begin(); i != substrings.end(); i++)
+		cout << i->second << ": " << i->first << endl;
 
-	cout << editDist(str1, str2, str1.length(), str2.length());
+	//cout << editDist(str1, str2, str1.length(), str2.length());
 
 	return 0;
 }
