@@ -1,7 +1,6 @@
-#include<stdc++.h>
+#include<bits/stdc++.h>
 #include <string>
 #include <map>
-#include<algorithm>
 using namespace std;
 
 int min(int x, int y, int z)
@@ -9,8 +8,8 @@ int min(int x, int y, int z)
 	return min(min(x, y), z);
 }
 
-//Global
-multimap <int, string> topK;
+multimap<int, string> maps;
+
 
 int editDist(string str1, string str2, int m, int n)
 {
@@ -38,9 +37,8 @@ int editDist(string str1, string str2, int m, int n)
 	);
 }
 
-multimap<int, string> subString(string str, string query, int n, int k)
+void subString(string str, string query, int n, int k)
 {
-	multimap <int, string> tempmap;
 	string temp = "";
 	// Pick starting point 
 	for (int len = 1; len <= n; len++)
@@ -52,51 +50,36 @@ multimap<int, string> subString(string str, string query, int n, int k)
 			// starting point to current ending 
 			// point.   
 			int j = i + len - 1;
-			for (int k = i; k <= j; k++)
-				temp += str[k];
-			int dist = editDist(temp, query, temp.length(), query.length());
-			if (tempmap.size() < k)
-				tempmap.insert(pair<int, string>(dist, temp));
+			for (int m = i; m <= j; m++)
+				temp += str[m];
+
+			if (maps.size() < k)
+				maps.insert(pair<int, string>(editDist(temp, query, temp.length(), query.length()), temp));
 			else
 			{
-				auto itr = --tempmap.end();
+				int dist = editDist(temp, query, temp.length(), query.length());
+				auto itr = --maps.end();
 				if (itr->first > dist)
 				{
-					tempmap.erase(itr);
-					tempmap.insert(pair<int, string>(dist, temp));
-				}
-			}		
-			if (topK.size() < k)
-				topK.insert(pair<int,string>(dist,temp));
-			else 
-			{
-				auto itr2 = --topK.end();
-				if (itr2->first > dist)
-				{
-					topK.erase(itr2);
-					topK.insert(pair<int, string>(dist, temp));
+					maps.erase(itr);
+					maps.insert(pair<int, string>(dist, temp));
 				}
 			}
 			temp = "";
 		}
 	}
-
-	return tempmap;
 }
 int main()
 {
-	string dataString[7] = { "Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday" };
-	string query = "saturday";
+	string dataString[7] = { "Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"};
+	string query = "saturdab";
 	int k = 3;
 	for (int i = 0; i < 7; i++) {
-		
-		multimap<int, string> substrings = subString(dataString[i], query, dataString[i].length(), k);
-		/*
-		cout << "The substring of " + dataString[i] +"\n";
-		for (auto i = substrings.begin(); i != substrings.end(); i++)
-			cout << i->second << ": " << i->first << endl;*/
+		subString(dataString[i], query, dataString[i].length(), k);
 	}
-	for (auto i = topK.begin(); i != topK.end(); i++)
-		cout << i->second << ": " << i->first << endl;
+	
+	for(auto itr = maps.begin(); itr != maps.end(); itr++)
+		cout << itr->first << ": " << itr->second << endl;
+
 	return 0;
 }
