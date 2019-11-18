@@ -12,6 +12,7 @@ private:
 public:
 	qGram(string s);
 	void print();
+	Struct* getQgram();
 };
 qGram::qGram(string s) {
 	size = 0;
@@ -22,6 +23,9 @@ qGram::qGram(string s) {
 		size++;
 	}
 }
+Struct* qGram::getQgram() {
+	return qgram;
+}
 void qGram::print() {
 	for (int i = 0; i < size; i++) {
 		cout << qgram[i].sub << " " << qgram[i].pos << "\n";
@@ -30,4 +34,6 @@ void qGram::print() {
 int main() {
 	qGram test = qGram("Why are we still here");
 	test.print();
+	Struct * ptr = test.getQgram();
+	cout << ptr[2].sub << " " << ptr[2].pos;
 }
