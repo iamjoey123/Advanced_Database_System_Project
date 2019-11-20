@@ -1,4 +1,4 @@
-#include<stdc++.h>
+#include<bits/stdc++.h>
 #include <string>
 #include <vector>
 #include <iterator>
@@ -80,6 +80,7 @@ std::vector<Struct> qGram::getQgram() {
 	return qgram;
 }
 
+
 void qGram::setSize(int s){ size = s; }
 
 void qGram::setCapacity(int c){ capac = c; }
@@ -108,6 +109,102 @@ void qGram::insert(string insertion, int pos)
 	qgram.push_back(temp);
 	size++;
 }
+
+/*int EditDist(string str1, string str2, int m, int n)
+{
+/*        int i,j;
+
+	int temp[m + 1][n + 1];
+	for(i = 0; i <= m; i++)
+		temp[i][0] = i;
+
+	for(j = 0; j <= n; j++)
+		temp[0][j] = j;
+
+	for(i = 1; i <= m; i++)
+	{
+		for(j = 1; j <= n; j++)
+		{
+			if(str1[i - 1] == str2[j - 1])
+				temp[i][j] = temp[i - 1][j - 1];
+			else
+			{
+				int a = 1 + temp[i-1][j];
+				int b = 1 + temp[i][j - 1];
+				int c = 1 + temp[i-1][j-1];
+				temp[i][j] = min(min(a, b),c);
+			}
+		}
+	}
+
+	return temp[m][n];
+
+	int temp[m + 1];
+
+	for(int i = 1; i <= m; i++)
+	{
+		temp[0] = i;
+		int t = i - 1;
+		for(int j = 1; j <= n; j++)
+		{
+			int tj = min(1 + min(temp[j], temp[j - 1]), str1[i - 1] == str2[j-1] ? t : t + 1);
+			t = temp[j];
+			temp[j] = tj;
+		}
+	}
+
+	std::sort(temp, temp + (m + 1));
+	
+	return temp[0];
+}*/
+
+
+int EditDist(string src, string dest, int len1, int len2)
+{
+    int i, j;
+ 
+    //create a matrix of order (len1+1)*(len2+1) to memoize values
+    int edit[len1+1][len2+1];
+ 
+    //edit[i][j]=minimum number of edit operations required to transform src[0....(i-1)] to dest[0...(j-1)]
+ 
+    //initializing
+    for(i=0;i<=len1;i++)
+        edit[i][0]=i;    //min operations required to transform src[0...i-1] to empty dest string
+ 
+    for(j=0;j<=len2;j++)
+        edit[0][j]=j;   //min operations required to transform empty src to dest[0...j-1]
+ 
+    //now, start filling the matrix row wise
+    for(i=1;i<=len1;i++)
+    {
+        for(j=1;j<=len2;j++)
+        {
+            //if current character of both strings match
+            if(src[i-1]==dest[j-1])
+            {
+                edit[i][j]=edit[i-1][j-1];
+            }
+ 
+            //mismatch
+            else
+            {
+                //try applying all operations and choose the one which costs minimum
+                int x=1+edit[i-1][j];    //delete 
+                int y=1+edit[i][j-1];    //insert
+                int z=1+edit[i-1][j-1];  //replace
+ 
+                edit[i][j]=min(x,min(y,z));
+ 
+            }
+        }
+    }
+ 
+    //now, return the final value 
+    return edit[len1][len2];
+ 
+}
+
 
 bool compareByPos(const Struct &a, const Struct &b)
 {
@@ -336,57 +433,83 @@ int DYN_LB(string query, string s)
 
 int main() {
 	clock_t begin = clock();
-	/*string s[5] = {"Jack Willson", "Jackson Pollock", "Jacksonbille", "OceanVille", "Jakobville"};
-	string q = "Jacksonville";
+/*	string s[6] = {"Jackson Pollock", "Jakob Pollack", "Jason Polock", "Jacksomville", "Jakson Pollack", "Mackson Polock"};
+	string q = "Jacksen";
 	
 	
 	cout << "The query string is:" << q << endl;
-	int k = 3;
-	for(int i = 0; i < 5; i++)
+	int k = 2;
+	for(int i = 0; i < 6; i++)
 	{
 		int d = DYN_LB(q, s[i]);
+		cout << "String: " << s[i] << " Lo: " << d << endl;
 		if(maps.size() < k)
-		{			
-			maps.insert(pair<int, string>(d, s[i]));
+		{
+			int dist = EditDist(s[i], q, s[i].length(), q.length());			
+			maps.insert(pair<int, string>(dist, s[i]));
 		}
 		else
 		{
 			auto itr = --maps.end();
-                        if (itr->first > d)
+			cout << "Top of map d: " << itr->first << endl;
+                        if (itr->first >= d)
                         {
-                        	maps.erase(itr);
-                        	maps.insert(pair<int, string>(d, s[i]));
+				int dist = EditDist(s[i], q, s[i].length(), q.length());
+				if(itr->first >= dist)
+				{
+                        		maps.erase(itr);
+                        		maps.insert(pair<int, string>(dist, s[i]));
+				}
                         }
 		}
-	}*/
+	}
+*/
+	int num_checked = 0;
 	ifstream file("dict.txt");
-	string q = "ABCDEFGHI";
-	cout << "The query string is:" << q << endl;
+	string q;
+	int k;
+	cout << "Enter value for K: ";
+	cin >> k;
+	cout << "K: " << k << endl;
+	cout << "Enter query string: ";
+	cin >> q;
+	cout << "The query string is: " << q << endl;
 	string str;
-	int k = 3;
 	int iter = 0;
 	while (getline(file, str)) {
+		iter++;
 		int d = DYN_LB(q, str);
 		if (maps.size() < k)
 		{
-			maps.insert(pair<int, string>(d, str));
+			num_checked++;
+			int dist = EditDist(str, q, str.length(), q.length());
+			maps.insert(pair<int, string>(dist, str));
 		}
 		else
 		{
+			int dist = EditDist(str, q, str.length(), q.length());
 			auto itr = --maps.end();
 			if (itr->first > d)
 			{
-				maps.erase(itr);
-				maps.insert(pair<int, string>(d, str));
+				num_checked++;
+				if(itr->first > dist)
+				{
+					maps.erase(itr);
+					maps.insert(pair<int, string>(dist, str));
+				}
 			}
 		}
 		iter++;
 	}
+	
+	cout << "Top " << k << " Strings:" << endl;
 	for(auto itr = maps.begin(); itr != maps.end(); itr++)
-		cout << itr->first << ": " << itr->second << endl;
+		cout << itr->second << endl;
 	clock_t end = clock();
 	double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-	//cout << "Number of words processed: " << iter << " words" << endl;
-	cout << "Time elapsed: " << elapsed_secs << " s";
+	cout << "Total number of words: " << iter << " words" << endl;
+	cout << "Number of words filtered: " << iter - num_checked << " words" << endl;
+	cout << "Number of words checked: " << num_checked << " words" << endl;
+	cout << "Time elapsed: " << elapsed_secs << " s" << endl;
 	return 0;
 }

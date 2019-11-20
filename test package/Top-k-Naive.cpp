@@ -1,4 +1,4 @@
-#include <stdc++.h>
+#include <bits/stdc++.h>
 #include <string>
 #include <map>
 #include <ctime>
@@ -12,7 +12,7 @@ int min(int x, int y, int z)
 multimap<int, string> maps;
 
 
-int editDist(string str1, string str2, int m, int n)
+/*int editDist(string str1, string str2, int m, int n)
 {
 	// If first string is empty, the only option is to 
 	// insert all characters of second string into first 
@@ -36,6 +36,53 @@ int editDist(string str1, string str2, int m, int n)
 		editDist(str1, str2, m - 1, n),   // Remove 
 		editDist(str1, str2, m - 1, n - 1) // Replace 
 	);
+}*/
+
+
+int EditDist(string src, string dest, int len1, int len2)
+{
+    int i, j;
+ 
+    //create a matrix of order (len1+1)*(len2+1) to memoize values
+    int edit[len1+1][len2+1];
+ 
+    //edit[i][j]=minimum number of edit operations required to transform src[0....(i-1)] to dest[0...(j-1)]
+ 
+    //initializing
+    for(i=0;i<=len1;i++)
+        edit[i][0]=i;    //min operations required to transform src[0...i-1] to empty dest string
+ 
+    for(j=0;j<=len2;j++)
+        edit[0][j]=j;   //min operations required to transform empty src to dest[0...j-1]
+ 
+    //now, start filling the matrix row wise
+    for(i=1;i<=len1;i++)
+    {
+        for(j=1;j<=len2;j++)
+        {
+            //if current character of both strings match
+            if(src[i-1]==dest[j-1])
+            {
+                edit[i][j]=edit[i-1][j-1];
+            }
+ 
+            //mismatch
+            else
+            {
+                //try applying all operations and choose the one which costs minimum
+                int x=1+edit[i-1][j];    //delete 
+                int y=1+edit[i][j-1];    //insert
+                int z=1+edit[i-1][j-1];  //replace
+ 
+                edit[i][j]=min(x,min(y,z));
+ 
+            }
+        }
+    }
+ 
+    //now, return the final value 
+    return edit[len1][len2];
+ 
 }
 
 void subString(string str, string query, int n, int k)
@@ -55,10 +102,10 @@ void subString(string str, string query, int n, int k)
 				temp += str[m];
 
 			if (maps.size() < k)
-				maps.insert(pair<int, string>(editDist(temp, query, temp.length(), query.length()), temp));
+				maps.insert(pair<int, string>(EditDist(temp, query, temp.length(), query.length()), temp));
 			else
 			{
-				int dist = editDist(temp, query, temp.length(), query.length());
+				int dist = EditDist(temp, query, temp.length(), query.length());
 				auto itr = --maps.end();
 				if (itr->first > dist)
 				{
@@ -74,9 +121,14 @@ int main()
 {
 	//string dataString[7] = { "Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"};
 	clock_t begin = clock();
-	string query = "CHEETOS";
-	cout << "The query string is:" << query << endl;
-	int k = 3;
+	int k;
+	string query;
+	cout << "Enter value for K: ";
+	cin >> k;
+	cout << "K: " << k << endl;
+	cout << "Enter query string: ";
+	cin >> query;
+	cout << "The query string is: " << query << endl;
 	ifstream file("dict.txt");
 	string str;
 	int iter = 0;
@@ -88,11 +140,15 @@ int main()
 		subString(dataString[i], query, dataString[i].length(), k);
 	}
 	*/
+	cout << "The Top " << k << " Strings: " << endl;
 	for(auto itr = maps.begin(); itr != maps.end(); itr++)
-		cout << itr->first << ": " << itr->second << endl;
+		cout << itr->second << endl;
 	clock_t end = clock();
 	double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
-	cout << "Number of words processed: " << iter << " words" << endl;
-	cout <<"Time elapsed: "<< elapsed_secs << " s";
+	cout << "Total Number of words: " << iter << " words" << endl;
+	cout << "Number of words checked: " << iter << " words" << endl;
+	cout << "Number of words filtered: " << 0 << " words" << endl;
+	cout << "Number of words checked: " << iter << " words << endl;
+	cout <<"Time elapsed: "<< elapsed_secs << " s" << endl;
 	return 0;
 }
