@@ -9,6 +9,8 @@
 
 using namespace std;
 
+multimap<int, string> maps;
+
 struct Struct {
 	string sub;
 	int pos;
@@ -181,7 +183,8 @@ int lower_boundthree(int ** m, std::vector<Struct> query, std::vector<Struct> st
 	
 int lower_boundtwo(list<std::vector<Struct>> vQgram, int i, int j, std::vector<Struct> query, std::vector<Struct> st, int ** m)
 {
-	int u,v,temp = 2147483647;
+	int u,v;
+	int temp = 2147483647;
 	bool foundmin;
 
 	for(auto k = vQgram.begin(); k != vQgram.end(); k++)
@@ -199,9 +202,9 @@ int lower_boundtwo(list<std::vector<Struct>> vQgram, int i, int j, std::vector<S
 
 				index1++;
 			}
-
+			
                         for(auto p = st.begin(); p != st.end(); p++){
-                                if((*p).getPos() == (*k)[0].getPos() && (*p).getString().compare((*k)[0].getString()) == 0)
+                                if((*p).getPos() == (*k)[1].getPos() && (*p).getString().compare((*k)[1].getString()) == 0)
                                 {
                                         v = index2;
                                         break;
@@ -209,7 +212,7 @@ int lower_boundtwo(list<std::vector<Struct>> vQgram, int i, int j, std::vector<S
 
                                 index2++;
                         }
-
+				
 			int m1 = m[u][v];
 			int m2 = ceil((query[i].getPos() - query[u].getPos() - 1) / 3.0);
 			int m3 = abs((query[i].getPos() - query[u].getPos()) - (st[j].getPos() - st[v].getPos()));
@@ -290,6 +293,7 @@ int lower_bound(qGram * newcombo, int qlength)
 			}
 			
 		}
+
 			if(j != -1)
 			{
 				locations.insert(pair<int,int>(i,j));
@@ -331,7 +335,28 @@ int DYN_LB(string query, string s)
 	
 
 int main() {
-	string s = "Jack Willson";
+	string s[5] = {"Jack Willson", "Jackson Pollock", "Jacksonbille", "OceanVille", "Jakobville"};
 	string q = "Jacksonville";
-	cout << "Lower_Bound = " << DYN_LB(q, s) << endl;
+	int k = 3;
+	for(int i = 0; i < 5; i++)
+	{
+		int d = DYN_LB(q, s[i]);
+		if(maps.size() < k)
+		{			
+			maps.insert(pair<int, string>(d, s[i]));
+		}
+		else
+		{
+			auto itr = --maps.end();
+                        if (itr->first > d)
+                        {
+                        	maps.erase(itr);
+                        	maps.insert(pair<int, string>(d, s[i]));
+                        }
+		}
+	}
+
+	for(auto itr = maps.begin(); itr != maps.end(); itr++)
+		cout << itr->first << ": " << itr->second << endl;
+
 }
