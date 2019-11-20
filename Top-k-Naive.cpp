@@ -1,6 +1,7 @@
-#include<bits/stdc++.h>
+#include <stdc++.h>
 #include <string>
 #include <map>
+#include <ctime>
 using namespace std;
 
 int min(int x, int y, int z)
@@ -62,7 +63,7 @@ void subString(string str, string query, int n, int k)
 				if (itr->first > dist)
 				{
 					maps.erase(itr);
-					maps.insert(pair<int, string>(dist, temp));
+					maps.insert(pair<int, string>(dist, str));
 				}
 			}
 			temp = "";
@@ -71,15 +72,27 @@ void subString(string str, string query, int n, int k)
 }
 int main()
 {
-	string dataString[7] = { "Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"};
-	string query = "saturdab";
+	//string dataString[7] = { "Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"};
+	clock_t begin = clock();
+	string query = "CHEETOS";
+	cout << "The query string is:" << query << endl;
 	int k = 3;
-	for (int i = 0; i < 7; i++) {
+	ifstream file("dic.txt");
+	string str;
+	int iter = 0;
+	while (getline(file, str)) {
+		subString(str, query,str.length(), k);
+		iter++;
+	}
+	/*for (int i = 0; i < 7; i++) {
 		subString(dataString[i], query, dataString[i].length(), k);
 	}
-	
+	*/
 	for(auto itr = maps.begin(); itr != maps.end(); itr++)
 		cout << itr->first << ": " << itr->second << endl;
-
+	clock_t end = clock();
+	double elapsed_secs = double(end - begin) / CLOCKS_PER_SEC;
+	cout << "Number of words processed: " << iter << " words" << endl;
+	cout <<"Time elapsed: "<< elapsed_secs << " s";
 	return 0;
 }
