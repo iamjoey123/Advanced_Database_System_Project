@@ -335,10 +335,10 @@ int DYN_LB(string query, string s)
 	
 
 int main() {
-	string s[5] = {"Jack Willson", "Jackson Pollock", "Jacksonbille", "OceanVille", "Jakobville"};
-	string q = "Jacksonville";
+	string s[6] = {"Jakob Pollack", "Jackson Pollock", "Jason Polock", "Jacksomville", "Jakson Pollack", "Mackson Polock"};
+	string q = "Jackson";
 	int k = 3;
-	for(int i = 0; i < 5; i++)
+	for(int i = 0; i < 6; i++)
 	{
 		int d = DYN_LB(q, s[i]);
 		if(maps.size() < k)
