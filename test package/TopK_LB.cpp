@@ -1,4 +1,4 @@
-#include<bits/stdc++.h>
+#include <stdc++.h>
 #include <string>
 #include <vector>
 #include <iterator>
@@ -162,10 +162,10 @@ void qGram::insert(string insertion, int pos)
 int EditDist(string src, string dest, int len1, int len2)
 {
     int i, j;
- 
     //create a matrix of order (len1+1)*(len2+1) to memoize values
-    int edit[len1+1][len2+1];
- 
+	int** edit = new int* [len1 + 1];
+	for (int i = 0; i < len1 + 1; ++i)
+		edit[i] = new int[len2 + 1];
     //edit[i][j]=minimum number of edit operations required to transform src[0....(i-1)] to dest[0...(j-1)]
  
     //initializing
@@ -432,7 +432,7 @@ int DYN_LB(string query, string s)
 	
 
 int main() {
-	clock_t begin = clock();
+	
 /*	string s[6] = {"Jackson Pollock", "Jakob Pollack", "Jason Polock", "Jacksomville", "Jakson Pollack", "Mackson Polock"};
 	string q = "Jacksen";
 	
@@ -465,7 +465,7 @@ int main() {
 	}
 */
 	int num_checked = 0;
-	ifstream file("dict.txt");
+	ifstream file("output.txt");
 	string q;
 	int k;
 	cout << "Enter value for K: ";
@@ -474,11 +474,10 @@ int main() {
 	cout << "Enter query string: ";
 	cin >> q;
 	cout << "The query string is: " << q << endl;
+	clock_t begin = clock();
 	string str;
 	int iter = 0;
 	while (getline(file, str)) {
-		iter++;
-		int d = DYN_LB(q, str);
 		if (maps.size() < k)
 		{
 			num_checked++;
@@ -487,10 +486,12 @@ int main() {
 		}
 		else
 		{
-			int dist = EditDist(str, q, str.length(), q.length());
+			int d = DYN_LB(q, str);
+			
 			auto itr = --maps.end();
 			if (itr->first > d)
 			{
+				int dist = EditDist(str, q, str.length(), q.length());
 				num_checked++;
 				if(itr->first > dist)
 				{
@@ -501,7 +502,7 @@ int main() {
 		}
 		iter++;
 	}
-	
+	cout << "TopK_LB Result:" << endl;
 	cout << "Top " << k << " Strings:" << endl;
 	for(auto itr = maps.begin(); itr != maps.end(); itr++)
 		cout << itr->second << endl;
