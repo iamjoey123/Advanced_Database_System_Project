@@ -455,13 +455,15 @@ int main() {
 	while (getline(file, str)) {
 		if (str.length() < 3) { continue; }
 		//cout << pq.top() << " " << iter << endl;
-		while (pq.top() < iter) { pq.pop(); }
-		if (pq.top() == iter & cond == true) {
-			pq.pop();
-		}
-		else {
-			iter++;
-			continue;
+		if (cond == true) {
+			if(pq.top() == iter){
+				cout << "hi";
+				pq.pop();
+			}
+			else {
+				iter++;
+				continue;
+			}
 		}
 		if (maps.size() < k)
 		{
@@ -485,10 +487,12 @@ int main() {
 				}
 			}
 			itr = --maps.end();
-			if (itr->first <= gPrime) { cond = true; }
+			if (itr->first <= gPrime) {
+				while (pq.top() < iter & cond == false) { pq.pop(); }
+				cond = true; }
 		}
 		else {
-			if (str.find("upp") == 0 & str.find("ppo") == 0 != std::string::npos) {
+			if (str.find("upp") == 0 & str.find("ort") == 0 != std::string::npos) {
 				int d = DYN_LB(q, str);	
 				auto itr = --maps.end();
 				if (itr->first > d)
