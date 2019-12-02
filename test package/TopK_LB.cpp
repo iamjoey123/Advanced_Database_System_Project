@@ -1,4 +1,4 @@
-#include <stdc++.h>
+#include <bits/stdc++.h>
 #include <string>
 #include <vector>
 #include <iterator>
@@ -203,6 +203,35 @@ int EditDist(string src, string dest, int len1, int len2)
     //now, return the final value 
     return edit[len1][len2];
  
+}
+
+int subString(string str, string query, int n, int k)
+{
+        int max = 2147483647;
+        string temp = "";
+        // Pick starting point 
+        for (int len = 1; len <= n; len++)
+        {
+                // Pick ending point 
+                for (int i = 0; i <= n - len; i++)
+                {
+                        //  Print characters from current 
+                        // starting point to current ending 
+                        // point.   
+                        int j = i + len - 1;
+                        for (int m = i; m <= j; m++)
+                                temp += str[m];
+                        
+                        int min = EditDist(temp, query, temp.length(), query.length());
+                        if(min < max)
+                        {
+                                max = min;
+                        }
+                        temp = "";
+                }
+        }
+
+        return max;
 }
 
 
@@ -465,7 +494,7 @@ int main() {
 	}
 */
 	int num_checked = 0;
-	ifstream file("output.txt");
+	ifstream file("dict.txt");
 	string q;
 	int k;
 	cout << "Enter value for K: ";
@@ -491,7 +520,7 @@ int main() {
 			auto itr = --maps.end();
 			if (itr->first > d)
 			{
-				int dist = EditDist(str, q, str.length(), q.length());
+				int dist = subString(str, q, str.length(), k);
 				num_checked++;
 				if(itr->first > dist)
 				{

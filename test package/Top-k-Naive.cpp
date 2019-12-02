@@ -1,4 +1,4 @@
-#include <stdc++.h>
+#include <bits/stdc++.h>
 #include <string>
 #include <map>
 #include <ctime>
@@ -103,7 +103,7 @@ int main()
 	cout << "Enter query string: ";
 	cin >> query;
 	cout << "The query string is: " << query << endl;
-	ifstream file("output.txt");
+	ifstream file("dict.txt");
 	string str;
 	int iter = 0;
 	while (getline(file, str)) {
