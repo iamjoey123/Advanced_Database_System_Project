@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <cmath>
 #include <ctime>
+#include <cctype>
 using namespace std;
 
 multimap<int, string> maps;
@@ -209,6 +210,7 @@ int subString(string str, string query, int n, int k)
 {
         int max = 2147483647;
         string temp = "";
+
         // Pick starting point 
         for (int len = 1; len <= n; len++)
         {
@@ -502,25 +504,33 @@ int main() {
 	cout << "K: " << k << endl;
 	cout << "Enter query string: ";
 	cin >> q;
+	string querylower = "";
+	for(int i = 0; i < q.length(); i++)
+		querylower += tolower(q[i]);
 	cout << "The query string is: " << q << endl;
 	clock_t begin = clock();
 	string str;
 	int iter = 0;
 	while (getline(file, str)) {
+                string strlower = "";
+
+                for(int i = 0; i < str.length(); i++)
+                	strlower += tolower(str[i]);
+
 		if (maps.size() < k)
 		{
 			num_checked++;
-			int dist = EditDist(str, q, str.length(), q.length());
+			int dist = subString(strlower, querylower, str.length(), k);
 			maps.insert(pair<int, string>(dist, str));
 		}
 		else
 		{
-			int d = DYN_LB(q, str);
+			int d = DYN_LB(querylower, strlower);
 			
 			auto itr = --maps.end();
 			if (itr->first > d)
 			{
-				int dist = subString(str, q, str.length(), k);
+				int dist = subString(strlower, querylower, strlower.length(), k);
 				num_checked++;
 				if(itr->first > dist)
 				{
