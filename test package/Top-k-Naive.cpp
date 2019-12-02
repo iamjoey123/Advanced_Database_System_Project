@@ -59,7 +59,7 @@ int EditDist(string src, string dest, int len1, int len2)
 
 }
 
-void subString(string str, string query, int n, int k)
+/*void subString(string str, string query, int n, int k)
 {
 	string temp = "";
 	// Pick starting point 
@@ -90,7 +90,38 @@ void subString(string str, string query, int n, int k)
 			temp = "";
 		}
 	}
+}*/
+
+int subString(string str, string query, int n, int k)
+{
+        int max = 2147483647;
+        string temp = "";
+
+        // Pick starting point 
+        for (int len = 1; len <= n; len++)
+        {
+                // Pick ending point 
+                for (int i = 0; i <= n - len; i++)
+                {
+                        //  Print characters from current 
+                        // starting point to current ending 
+                        // point.   
+                        int j = i + len - 1;
+                        for (int m = i; m <= j; m++)
+                                temp += str[m];
+
+                        int min = EditDist(temp, query, temp.length(), query.length());
+                        if(min < max)
+                        {
+                                max = min;
+                        }
+                        temp = "";
+                }
+        }
+
+        return max;
 }
+
 int main()
 {
 	//string dataString[7] = { "Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"};
@@ -102,12 +133,32 @@ int main()
 	cout << "K: " << k << endl;
 	cout << "Enter query string: ";
 	cin >> query;
+        string querylower = "";
+        for(int i = 0; i < query.length(); i++)
+                querylower += tolower(query[i]);
+
 	cout << "The query string is: " << query << endl;
 	ifstream file("dict.txt");
 	string str;
 	int iter = 0;
 	while (getline(file, str)) {
-		subString(str, query,str.length(), k);
+                string strlower = "";
+
+                for(int i = 0; i < str.length(); i++)
+                        strlower += tolower(str[i]);
+
+		int dist = subString(strlower, querylower,strlower.length(), k);
+		if(maps.size() < k)
+			 maps.insert(pair<int, string>(dist,str));
+		else
+		{
+                	auto itr = --maps.end();
+                        if (itr->first > dist)
+                        {
+                        	maps.erase(itr);
+                                maps.insert(pair<int, string>(dist, str));
+                        }
+		}
 		iter++;
 	}
 	cout << "The Top " << k << " Strings: " << endl;
