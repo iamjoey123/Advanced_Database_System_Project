@@ -500,7 +500,6 @@ int main() {
 				{
 					num_checked++;
 					int dist = subString(str, q, str.length(), k);
-					num_checked++;
 					if (itr->first > dist)
 					{
 						maps.erase(itr);
