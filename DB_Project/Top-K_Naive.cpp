@@ -24,9 +24,7 @@ int EditDist(string src, string dest, int len1, int len2)
 	int i, j;
 
 	//create a matrix of order (len1+1)*(len2+1) to memoize values
-	int** edit = new int* [len1 + 1];
-	for (int i = 0; i < len1 + 1; ++i)
-		edit[i] = new int[len2 + 1];
+	int edit[len1 + 1][len2 + 1];
 
 	//edit[i][j]=minimum number of edit operations required to transform src[0....(i-1)] to dest[0...(j-1)]
 
@@ -67,68 +65,79 @@ int EditDist(string src, string dest, int len1, int len2)
 
 }
 
-void subString(string str, string query, int n, int k)
+int subString(string str, string query, int n, int k)
 {
-	string temp = "";
-	// Pick starting point 
-	for (int len = 1; len <= n; len++)
-	{
-		// Pick ending point 
-		for (int i = 0; i <= n - len; i++)
-		{
-			//  Print characters from current 
-			// starting point to current ending 
-			// point.   
-			int j = i + len - 1;
-			for (int m = i; m <= j; m++)
-				temp += str[m];
+        int max = 2147483647;
+        string temp = "";
 
-			if (maps.size() < k)
-				maps.insert(pair<int, string>(EditDist(temp, query, temp.length(), query.length()), temp));
-			else
-			{
-				int dist = EditDist(temp, query, temp.length(), query.length());
-				auto itr = --maps.end();
-				if (itr->first > dist)
-				{
-					maps.erase(itr);
-					maps.insert(pair<int, string>(dist, str));
-				}
-			}
-			temp = "";
-		}
-	}
+        // Pick starting point 
+        for (int len = 1; len <= n; len++)
+        {
+                // Pick ending point 
+                for (int i = 0; i <= n - len; i++)
+                {
+                        //  Print characters from current 
+                        // starting point to current ending 
+                        // point.   
+                        int j = i + len - 1;
+                        for (int m = i; m <= j; m++)
+                                temp += str[m];
+
+                        int min = EditDist(temp, query, temp.length(), query.length());
+                        if(min < max)
+                        {
+                                max = min;
+                        }
+                        temp = "";
+                }
+        }
+
+        return max;
 }
-int main()
+int main(int argc, char *argv[])
 {
 	int k = 2; string q;
 	cout << "Choose between 1. dblp.txt and 2. wiki.txt 3. dict.txt(input 1 or 2 or 3):";
 	int choice;
-	ifstream file;
 	cin >> choice;
+	string filename;
 	if (choice == 1) {
 		cout << "Reading DBLP set--" << endl;
-		ifstream file("Dataset/dblp.txt");
+		filename = "dblp.txt";
 		q = "support";
 		cout << "Query string is:" << q << ",K is 2" << endl;
 	}
 	else if (choice == 2) {
 		cout << "Reading Wikipedia set--" << endl;
-		ifstream file("Dataset/wiki.txt");
+		filename = "wiki.txt";
 		q = "similar";
 		cout << "Query string is:" << q << ",K is 2" << endl;
 	}
 	else {
 		cout << "Reading Collins Dictionary set--" << endl;
-		ifstream file("Dataset/dict.txt");
+		filename = "dict.txt";
 		q = "support";
 		cout << "Query string is:" << q << ",K is 2" << endl;
 	}
+	ifstream file(filename);
 	clock_t begin = clock();
 	string str;
 	int iter = 0;
 	while (getline(file, str)) {
-		subString(str, q, str.length(), k);
+		if(iter % 10000==0){cout<<"Number of strings processed:"<<iter<<endl;}
+                int dist = subString(str, q,str.length(), k);
+                if(maps.size() < k)
+                         maps.insert(pair<int, string>(dist,str));
+                else
+                {
+                        auto itr = --maps.end();
+                        if (itr->first > dist)
+                        {
+                                maps.erase(itr);
+                                maps.insert(pair<int, string>(dist, str));
+                        }
+                }
+
 		iter++;
 	}
 	cout << "The Top " << k << " Strings: " << endl;

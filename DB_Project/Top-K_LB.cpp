@@ -12,6 +12,12 @@
 #include <queue>
 using namespace std;
 
+
+int min(int x, int y, int z)
+{
+        return min(min(x, y), z);
+}
+
 multimap<int, string> maps;
 
 struct Struct {
@@ -115,11 +121,10 @@ void qGram::insert(string insertion, int pos)
 
 int EditDist(string src, string dest, int len1, int len2)
 {
+
     int i, j;
     //create a matrix of order (len1+1)*(len2+1) to memoize values
-	int** edit = new int* [len1 + 4];
-	for (int i = 0; i < len1 + 1; ++i)
-		edit[i] = new int[len2 + 4];
+	int edit[len1 + 1][len2 + 1];
     //edit[i][j]=minimum number of edit operations required to transform src[0....(i-1)] to dest[0...(j-1)]
  
     //initializing
@@ -156,7 +161,70 @@ int EditDist(string src, string dest, int len1, int len2)
  
     //now, return the final value 
     return edit[len1][len2];
- 
+
+    // Create a table to store results of subproblems
+/*    int dp[m+1][n+1];
+
+    // Fill d[][] in bottom up manner
+    for (int i=0; i<=m; i++)
+    {
+        for (int j=0; j<=n; j++)
+        {
+            // If first string is empty, only option is to
+            // insert all characters of second string
+            if (i==0)
+                dp[i][j] = j;  // Min. operations = j
+
+            // If second string is empty, only option is to
+            // remove all characters of second string
+            else if (j==0)
+                dp[i][j] = i; // Min. operations = i
+
+            // If last characters are same, ignore last char
+            // and recur for remaining string
+            else if (str1[i-1] == str2[j-1])
+                dp[i][j] = dp[i-1][j-1];
+
+            // If the last character is different, consider all
+            // possibilities and find the minimum
+            else
+                dp[i][j] = 1 + min(dp[i][j-1],  // Insert
+                                   dp[i-1][j],  // Remove
+                                   dp[i-1][j-1]); // Replace
+        }
+    }
+
+    return dp[m][n]; */
+}
+
+int subString(string str, string query, int n, int k)
+{
+        int max = 2147483647;
+        string temp = "";
+
+        // Pick starting point 
+        for (int len = 1; len <= n; len++)
+        {
+                // Pick ending point 
+                for (int i = 0; i <= n - len; i++)
+                {
+                        //  Print characters from current 
+                        // starting point to current ending 
+                        // point.   
+                        int j = i + len - 1;
+                        for (int m = i; m <= j; m++)
+                                temp += str[m];
+
+                        int min = EditDist(temp, query, temp.length(), query.length());
+                        if(min < max)
+                        {
+                                max = min;
+                        }
+                        temp = "";
+                }
+        }
+
+        return max;
 }
 
 
@@ -388,38 +456,39 @@ int DYN_LB(string query, string s)
 int main() {
 	int num_checked = 0;
 	string q;
-	int k;
+	int k = 2;
 	cout << "Choose between 1. dblp.txt and 2. wiki.txt 3. dict.txt(input 1 or 2 or 3):";
 	int choice;
-	ifstream file;
+	string filename;
 	cin >> choice;
 	if (choice == 1) {
 		cout << "Reading DBLP set--" << endl;
-		ifstream file("Dataset/dblp.txt");
+		filename = "dblp.txt";
 		q = "support";
-		cout << "Query string is:" << q << ",K is 2" << endl;
+		cout << "Query string is:" << q << ", K is 2" << endl;
 	}
 	else if (choice == 2) {
 		cout << "Reading Wikipedia set--" << endl;
-		ifstream file("Dataset/wiki.txt");
+		filename = "wiki.txt";
 		q = "similar";
-		cout << "Query string is:" << q << ",K is 2" << endl;
+		cout << "Query string is:" << q << ", K is 2" << endl;
 	}
 	else {
 		cout << "Reading Collins Dictionary set--" << endl;
-		ifstream file("Dataset/dict.txt");
+		filename = "dict.txt";
 		q = "support";
-		cout << "Query string is:" << q << ",K is 2" << endl;
+		cout << "Query string is:" << q << ", K is 2" << endl;
 	}
+	ifstream file(filename);
 	clock_t begin = clock();
 	string str;
 	int iter = 0;
 	while (getline(file, str)) {
-		if (str.length() < 3) { continue; }
+		if(iter % 100000==0){cout<<"Number of strings processed:"<<iter<<endl;}
 		if (maps.size() < k)
 		{
 			num_checked++;
-			int dist = EditDist(str, q, str.length(), q.length());
+			int dist = subString(str, q, str.length(), k);
 			maps.insert(pair<int, string>(dist, str));
 		}
 		else
@@ -429,7 +498,7 @@ int main() {
 			auto itr = --maps.end();
 			if (itr->first > d)
 			{
-				int dist = EditDist(str, q, str.length(), q.length());
+				int dist = subString(str, q, str.length(), k);
 				num_checked++;
 				if(itr->first > dist)
 				{

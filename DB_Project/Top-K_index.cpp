@@ -117,11 +117,7 @@ void qGram::insert(string insertion, int pos)
 int EditDist(string src, string dest, int len1, int len2)
 {
 	int i, j;
-	//create a matrix of order (len1+1)*(len2+1) to memoize values
-	//int edit[len1 + 1][len2 + 1];
-	int** edit = new int* [len1 + 1];
-	for (int i = 0; i < len1 + 1; ++i)
-		edit[i] = new int[len2 + 1];
+	int edit[len1 + 1][len2 + 1];
 	//edit[i][j]=minimum number of edit operations required to transform src[0....(i-1)] to dest[0...(j-1)]
 
 	//initializing
@@ -159,6 +155,36 @@ int EditDist(string src, string dest, int len1, int len2)
 	//now, return the final value 
 	return edit[len1][len2];
 
+}
+
+int subString(string str, string query, int n, int k)
+{
+        int max = 2147483647;
+        string temp = "";
+
+        // Pick starting point 
+        for (int len = 1; len <= n; len++)
+        {
+                // Pick ending point 
+                for (int i = 0; i <= n - len; i++)
+                {
+                        //  Print characters from current 
+                        // starting point to current ending 
+                        // point.   
+                        int j = i + len - 1;
+                        for (int m = i; m <= j; m++)
+                                temp += str[m];
+
+                        int min = EditDist(temp, query, temp.length(), query.length());
+                        if(min < max)
+                        {
+                                max = min;
+                        }
+                        temp = "";
+                }
+        }
+
+        return max;
 }
 
 
@@ -392,59 +418,47 @@ int main() {
 	priority_queue <int, vector<int>, greater<int> > pq;
 	cout << "Choose between 1. dblp.txt and 2. wiki.txt and 3. dict.txt (input 1 or 2 or 3):";
 	int choice;
-	ifstream file;
+	string filename;
+	string pointername;
 	cin >> choice;
 	string q; int k = 2;
 	if (choice == 1) {
 		cout << "Reading DBLP set--" << endl;
 		q = "support";
 		cout << "The query string is: " << q << ",K is 2." << endl;
-		ifstream file;
-		file.open("Dataset\dblp.txt");
-		ifstream file1;
-		file1.open("Dataset\dblpPointers.txt");
-		string str1;
-		while (getline(file1, str1)) {
-			pq.push(stoi(str1));
-		}
-
+		filename = "dblp.txt";
+		pointername = "dblpPointers.txt";
 	}
 	else if (choice == 2){
 		cout << "Reading Wikipedia set--" << endl;
 		q = "similar";
 		cout << "The query string is: " << q << ",K is 2." << endl;
-		ifstream file;
-		file.open("Dataset\wiki.txt");
-		ifstream file1;
-		file1.open("Dataset\wikiPointers.txt");	
-		string str1;
-		while (getline(file1, str1)) {
-			pq.push(stoi(str1));
-		}
+		filename = "wiki.txt";
+		pointername = "wikiPointers.txt";	
 	}
 	else {
 		cout << "Reading Collins Dictionary set--" << endl;
 		q = "support";
 		cout << "The query string is: " << q << ",K is 2." << endl;
-		ifstream file;
-		file.open("Dataset\dict.txt");
-		ifstream file1;
-		file1.open("Dataset\dictPointers.txt");
-		string str1;
-		while (getline(file1, str1)) {
-			pq.push(stoi(str1));
-		}
+		filename = "dict.txt";
+		pointername = "dictPointer.txt";
+		
 	}
+	ifstream tempfile(pointername);
+	ifstream file(filename);
+	string str1;
+	while (getline(tempfile, str1)) {
+		pq.push(stoi(str1));
+	}		
 	clock_t begin = clock();
 	string str;
 	int iter = 0;
 	bool cond = false;
 	while (getline(file, str)) {
-		if (str.length() < 3) { continue; }
-		//cout << pq.top() << " " << iter << endl;
+		if(iter % 100000==0){cout<<"Number of strings processed:"<<iter<<endl;}
+        if(str.length()<3){iter++;continue;}
 		if (cond == true) {
 			if(pq.top() == iter){
-				cout << "hi";
 				pq.pop();
 			}
 			else {
@@ -455,7 +469,7 @@ int main() {
 		if (maps.size() < k)
 		{
 			num_checked++;
-			int dist = EditDist(str, q, str.length(), q.length());
+			int dist = subString(str, q, str.length(), k);
 			maps.insert(pair<int, string>(dist, str));
 		}
 		else if (cond == false)
@@ -465,7 +479,7 @@ int main() {
 			auto itr = --maps.end();
 			if (itr->first > d)
 			{
-				int dist = EditDist(str, q, str.length(), q.length());
+				int dist = subString(str, q, str.length(), k);
 				num_checked++;
 				if (itr->first > dist)
 				{
@@ -485,7 +499,7 @@ int main() {
 				if (itr->first > d)
 				{
 					num_checked++;
-					int dist = EditDist(str, q, str.length(), q.length());
+					int dist = subString(str, q, str.length(), k);
 					num_checked++;
 					if (itr->first > dist)
 					{
