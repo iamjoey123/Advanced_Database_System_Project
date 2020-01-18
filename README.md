@@ -1,6 +1,8 @@
 # Advanced_Database_System_Project
 Joshua Williams & Kuan Chieh Peng
 
+This is for project submission of advanced database system in fall 2019.
+
 Our goal for this project is to implement the paper, "Efficient Top-k Algorithms for Approximate Substring". Since the datasets are so large, we could not upload the whole project here. As a result, We will upload the actual coding of the four algorithms and the makefile here on github and provide a link below to downlip a zip file that contains the datasets and all of the code together.
 
 https://www.dropbox.com/s/9uch3qkk5ysstts/DB_Project.zip?dl=0
